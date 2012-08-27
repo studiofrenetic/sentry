@@ -232,7 +232,7 @@ class Sentry
 				$update['temp_password'] = '';
 			}
 
-			$update['last_login'] = time();
+			$update['last_login'] = static::sql_timestamp();
 			$update['ip_address'] = Request::ip();
 
 			// update user
@@ -267,8 +267,8 @@ class Sentry
 			throw new SentryException(__('sentry::sentry.user_not_found'));
 		}
 
-		Session::set(Config::get('sentry::sentry.session.user'), $id);
-		Session::set(Config::get('sentry::sentry.session.provider'), $provider);
+		Session::put(Config::get('sentry::sentry.session.user'), $id);
+		Session::put(Config::get('sentry::sentry.session.provider'), $provider);
 		return true;
 	}
 
@@ -539,7 +539,7 @@ class Sentry
 			{
 				// update last login
 				$user->update(array(
-					'last_login' => time()
+					'last_login' => static::sql_timestamp(),
 				));
 
 				// set session vars
@@ -593,6 +593,17 @@ class Sentry
 		}
 
 		return $user;
+	}
+
+	/**
+	 * Returns an SQL timestamp appropriate
+	 * for the currect database driver.
+	 *
+	 * @return   string
+	 */
+	protected static function sql_timestamp()
+	{
+		return date(DB::connection(static::$db_instance)->grammar()->grammar->datetime);
 	}
 
 }
