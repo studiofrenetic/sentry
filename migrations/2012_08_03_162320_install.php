@@ -41,12 +41,11 @@ class Sentry_Install
 			$table->string('remember_me');
 			$table->string('activation_hash');
 			$table->string('ip_address');
-			$table->integer('last_login');
-			$table->integer('updated_at');
-			$table->integer('created_at');
 			$table->string('status');
 			$table->string('activated');
 			$table->text('permissions');
+			$table->timestamp('last_login');
+			$table->timestamps();
 		});
 
 		// Create user metadata table
@@ -67,7 +66,7 @@ class Sentry_Install
 			$table->text('permissions');
 		});
 
-		// create users group relation table
+		// Create users group relation table
 		Schema::table(Config::get('sentry::sentry.table.users_groups'), function($table) {
 			$table->on(Config::get('sentry::sentry.db_instance'));
 			$table->create();
@@ -75,7 +74,7 @@ class Sentry_Install
 			$table->integer('group_id')->unsigned();
 		});
 
-		// create suspension table
+		// Create suspension table
 		Schema::table(Config::get('sentry::sentry.table.users_suspended'), function($table) {
 			$table->on(Config::get('sentry::sentry.db_instance'));
 			$table->create();
@@ -83,11 +82,10 @@ class Sentry_Install
 			$table->string('login_id');
 			$table->integer('attempts');
 			$table->string('ip');
-			$table->integer('last_attempt_at');
-			$table->integer('suspended_at');
-			$table->integer('unsuspend_at');
+			$table->timestamp('last_attempt_at');
+			$table->timestamp('suspended_at');
+			$table->timestamp('unsuspend_at');
 		});
-
 	}
 
 	/**
@@ -97,7 +95,7 @@ class Sentry_Install
 	 */
 	public function down()
 	{
-		// drop all tables
+		// Drop all tables
 		Schema::table(Config::get('sentry::sentry.table.users'), function($table) {
 			$table->on(Config::get('sentry::sentry.db_instance'));
 			$table->drop();
