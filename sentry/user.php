@@ -1014,6 +1014,7 @@ class Sentry_User implements \Iterator, \ArrayAccess
 	{
 		$users = DB::connection($this->db_instance)
 			->table($this->table)
+			->join($this->table_metadata, $this->table.'.id', '=', $this->table_metadata.'.user_id')
 			->get();
 
 		foreach ($users as &$user)
