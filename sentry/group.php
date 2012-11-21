@@ -326,13 +326,15 @@ class Sentry_Group implements \Iterator, \ArrayAccess
 	{
 		$users_table = Config::get('sentry::sentry.table.users');
 		$groups_table = Config::get('sentry::sentry.table.groups');
+		$table_metadata = Config::get('sentry::sentry.table.users_metadata');
 
 		$users = DB::connection(static::$db_instance)
 			->table($users_table)
 			->where(static::$join_table.'.group_id', '=', $this->group['id'])
 			->join(static::$join_table,
 						static::$join_table.'.user_id', '=', $users_table.'.id')
-			->get($users_table.'.*');
+			->join($table_metadata, $users_table.'.id', '=', $table_metadata.'.user_id')
+			->get(array($users_table.'.*', $table_metadata.'.first_name', $table_metadata.'.last_name'));
 
 		if (count($users) == 0)
 		{

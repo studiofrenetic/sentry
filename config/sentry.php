@@ -158,7 +158,7 @@ return array(
 		 * If database is chosen it reads the rules from the rules table defined in the table array
 		 *
 		 */
-		'rules_source' => 'database',
+		'rules_source' => 'file',
 
 		/**
 		 * The permission rules file
@@ -176,8 +176,8 @@ return array(
 			 *  - name will be the file name of the php file
 			 *  - path will be relative to the current bundles base folder
 			 */
-			'type' => 'php',
-			'name' => 'extension',
+			'type' => 'config',
+			'name' => '',
 			'path' => '',
 		),
 
