@@ -85,7 +85,12 @@ class Sentry_Rules
 		// see if type is config
 		if ( $permission_file['type'] == 'config' or empty($permission_file['type']) or $permission_file['type'] == null)
 		{
-			foreach (Bundle::$bundles as $bundle => $values)
+			$bundles = Bundle::$bundles;
+
+			if ( ! array_key_exists('application', $bundles))
+				$bundles['application'] = array();
+
+			foreach ($bundles as $bundle => $values)
 			{
 				$bundle_rules = Config::get($bundle.'::permissions.rules');
 
