@@ -224,6 +224,15 @@ class Sentry_User implements \Iterator, \ArrayAccess
 			{
 				$this->rules       = Sentry_Rules::fetch_rules();
 				$this->permissions = $this->fetch_permissions();
+
+				$permissions = array();
+
+				foreach ($this->permissions as $permission)
+				{
+					$permissions[$permission] = 1;
+				}
+
+				$this->user['permissions'] = json_encode($this->process_permissions($permissions));
 			}
 		}
 	}
