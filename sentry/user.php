@@ -226,13 +226,15 @@ class Sentry_User implements \Iterator, \ArrayAccess
 				$this->permissions = $this->fetch_permissions();
 
 				$permissions = array();
-
-				foreach ($this->permissions as $permission)
+				if (count($this->permissions))
 				{
-					$permissions[$permission] = 1;
-				}
+					foreach ($this->permissions as $permission)
+					{
+						$permissions[$permission] = 1;
+					}
 
-				$this->user['permissions'] = json_encode($this->process_permissions($permissions));
+					$this->user['permissions'] = json_encode($this->process_permissions($permissions));
+				}
 			}
 		}
 	}
