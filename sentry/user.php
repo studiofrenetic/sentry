@@ -516,6 +516,18 @@ class Sentry_User implements \Iterator, \ArrayAccess
 			unset($fields['ip_address']);
 		}
 
+		if (array_key_exists('firstname', $fields))
+		{
+			$update['firstname'] = $fields['firstname'];
+			unset($fields['firstname']);
+		}
+
+		if (array_key_exists('lastname', $fields))
+		{
+			$update['lastname'] = $fields['lastname'];
+			unset($fields['lastname']);
+		}
+
 		if (array_key_exists('activated', $fields))
 		{
 			$update['activated'] = $fields['activated'];
