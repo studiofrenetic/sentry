@@ -510,41 +510,22 @@ class Sentry_User implements \Iterator, \ArrayAccess
 			unset($fields['last_login']);
 		}
 
-		if (array_key_exists('ip_address', $fields))
-		{
-			$update['ip_address'] = $fields['ip_address'];
-			unset($fields['ip_address']);
-		}
-
-		if (array_key_exists('firstname', $fields))
-		{
-			$update['firstname'] = $fields['firstname'];
-			unset($fields['firstname']);
-		}
-
-		if (array_key_exists('lastname', $fields))
-		{
-			$update['lastname'] = $fields['lastname'];
-			unset($fields['lastname']);
-		}
-
-		if (array_key_exists('activated', $fields))
-		{
-			$update['activated'] = $fields['activated'];
-			unset($fields['activated']);
-		}
-
-		if (array_key_exists('status', $fields))
-		{
-			$update['status'] = $fields['status'];
-			unset($fields['status']);
-		}
-
 		if (array_key_exists('permissions', $fields))
 		{
 			$permissions = $this->process_permissions($fields['permissions']);
 			$update['permissions'] = json_encode($permissions);
 			unset($fields['permissions']);
+		}
+
+		// Update every last fields that doesn't need special processing
+		foreach ($fields as $field => $val)
+		{
+			// TODO: Remove metadata
+			if ($field != 'metadata')
+			{
+				$update[$field] = $val;
+				unset($fields[$field]);
+			}
 		}
 
 		if (empty($update) and empty($fields['metadata']))
