@@ -88,6 +88,7 @@ class Sentry
 		if ( ! empty($db_instance) )
 		{
 			static::$db_instance = $db_instance;
+			Sentry_Rules::set_db_instance($db_instance);
 		}
 
 		// login_column check
@@ -139,6 +140,21 @@ class Sentry
 		{
 			throw new SentryException($e->getMessage());
 		}
+	}
+
+	/**
+	 * Return the user id if a user is logged in
+	 *
+	 * @return  int|bool
+	 */
+	public static function user_id()
+	{
+		if (static::check())
+		{
+			return Session::get(Config::get('sentry::sentry.session.user'));
+		}
+
+		return false;
 	}
 
 	/**
@@ -269,7 +285,7 @@ class Sentry
 
 		if ( ! is_int($id))
 		{
-			$id = static::user($id)->get('id');
+			$id = (int) static::user($id)->get('id');
 		}
 
 		Session::put(Config::get('sentry::sentry.session.user'), $id);
@@ -290,10 +306,18 @@ class Sentry
 		// invalid session values - kill the user session
 		if ($user_id === null or ! is_numeric($user_id))
 		{
-			// if they are not logged in - check for cookie and log them in
-			if (static::is_remembered())
+			try
 			{
-				return true;
+				// if they are not logged in - check for cookie and log them in
+				if (static::is_remembered())
+				{
+					return true;
+				}
+			}
+			catch(SentryException $e)
+			{
+				static::logout();
+				return false;
 			}
 
 			//else log out
@@ -406,7 +430,7 @@ class Sentry
 	 *
 	 * @param   string  Login Column value
 	 * @param   string  Reset password code
-	 * @return  bool
+	 * @return  bool|int  If confirmed, user Id; else, false
 	 * @throws  SentryException
 	 */
 	public static function reset_password_confirm($login_column_value, $code, $decode = true)
@@ -446,7 +470,7 @@ class Sentry
 				'remember_me' => '',
 			), false);
 
-			return true;
+			return (int) $user->id;
 		}
 
 		return false;
@@ -539,8 +563,16 @@ class Sentry
 			$val = base64_decode($encoded_val);
 			list($login_column, $hash) = explode(':', $val);
 
+			if ( ! static::user_exists($login_column))
+			{
+				static::logout();
+				return false;
+			}
+
+			$user = static::validate_user($login_column, $hash, 'remember_me');
+
 			// if user is validated
-			if ($user = static::validate_user($login_column, $hash, 'remember_me'))
+			if ($user)
 			{
 				// update last login
 				$user->update(array(
